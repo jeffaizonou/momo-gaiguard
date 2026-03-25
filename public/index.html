@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MoMo GaïGuard — Protection Mobile Money</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0a0e14;
+    color: #e8f0fe;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: #111620;
+    border-bottom: 2px solid #00d4a0;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 20px; font-weight: 800;
+  }
+  .logo-icon {
+    background: #00d4a0;
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    display: flex; align-items: center;
+    justify-content: center; font-size: 18px;
+  }
+  .logo span { color: #00d4a0; }
+  .statut {
+    font-size: 11px;
+    color: #00d4a0;
+    display: flex; align-items: center; gap: 6px;
+    font-family: monospace;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    background: #00d4a0; border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* MAIN */
+  main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,212,160,0.08);
+    border: 1px solid rgba(0,212,160,0.25);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 11px; color: #00d4a0;
+    font-family: monospace;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 26px; font-weight: 800;
+    line-height: 1.2; margin-bottom: 8px;
+  }
+  h1 em { font-style: normal; color: #00d4a0; }
+  .sous-titre {
+    color: #6b7a99; font-size: 13px;
+    line-height: 1.6; margin-bottom: 28px;
+  }
+
+  /* CARTE ANALYSE */
+  .carte {
+    background: #131b28;
+    border: 1px solid #1e2a3a;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .label {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b7a99; margin-bottom: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    background: #161d2a;
+    border: 1px solid #1e2a3a;
+    border-radius: 10px;
+    color: #e8f0fe;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 14px;
+    resize: vertical;
+    min-height: 110px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+  textarea:focus { border-color: #00d4a0; }
+  textarea::placeholder { color: #3a4a66; }
+
+  /* EXEMPLES */
+  .exemples {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 10px;
+  }
+  .ex-btn {
+    padding: 5px 10px;
+    background: #161d2a;
+    border: 1px solid #1e2a3a;
+    border-radius: 6px;
+    color: #6b7a99;
+    font-size: 11px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ex-btn:hover {
+    border-color: #00d4a0; color: #00d4a0;
+  }
+
+  /* BOUTON ANALYSER */
+  .btn-analyser {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #00d4a0, #00b88a);
+    border: none; border-radius: 12px;
+    color: #000;
+    font-size: 15px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    margin-top: 14px;
+  }
+  .btn-analyser:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(0,212,160,0.35);
+  }
+  .btn-analyser:active { transform: translateY(0); }
+  .btn-analyser:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* RÉSULTAT */
+  #resultat { display: none; }
+
+  .result-box {
+    border-radius: 14px;
+    padding: 20px;
+    border: 2px solid;
+    margin-bottom: 12px;
+  }
+  .result-box.danger {
+    background: rgba(255,61,90,0.06);
+    border-color: #ff3d5a;
+  }
+  .result-box.suspect {
+    background: rgba(255,159,28,0.06);
+    border-color: #ff9f1c;
+  }
+  .result-box.sur {
+    background: rgba(6,214,160,0.06);
+    border-color: #06d6a0;
+  }
+
+  .result-top {
+    display: flex; align-items: flex-start;
+    gap: 14px; margin-bottom: 14px;
+  }
+  .result-emoji { font-size: 34px; line-height: 1; }
+  .result-verdict {
+    font-size: 18px; font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .result-sub {
+    font-size: 12px; color: #6b7a99;
+    margin-top: 3px; line-height: 1.5;
+  }
+
+  /* BARRE DE RISQUE */
+  .barre-label {
+    font-size: 11px; color: #6b7a99;
+    margin-bottom: 6px; font-family: monospace;
+  }
+  .barre-bg {
+    background: #161d2a;
+    border-radius: 6px; height: 8px;
+    overflow: hidden; margin-bottom: 14px;
+  }
+  .barre-fill {
+    height: 100%; border-radius: 6px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* SIGNAUX */
+  .signaux-titre {
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b7a99; margin-bottom: 8px;
+  }
+  .signaux-liste {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .signal-tag {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    background: rgba(255,61,90,0.1);
+    border: 1px solid rgba(255,61,90,0.25);
+    color: #ff6b80;
+  }
+  .signal-tag.orange {
+    background: rgba(255,159,28,0.1);
+    border-color: rgba(255,159,28,0.25);
+    color: #ffb84d;
+  }
+
+  /* CONSEIL */
+  .conseil-box {
+    background: rgba(0,212,160,0.05);
+    border: 1px solid rgba(0,212,160,0.15);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .conseil-box strong { color: #00d4a0; }
+
+  /* CONTACTS URGENCE */
+  .contacts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-top: 16px;
+  }
+  .contact {
+    background: #131b28;
+    border: 1px solid #1e2a3a;
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .contact-num {
+    font-family: monospace;
+    font-size: 18px; font-weight: 700;
+    color: #00d4a0;
+  }
+  .contact-nom {
+    font-size: 10px; color: #6b7a99;
+    margin-top: 3px;
+  }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px; color: #3a4a66;
+    font-family: monospace; line-height: 1.7;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    MoMo<span>GaïGuard</span>
+  </div>
+  <div class="statut">
+    <div class="dot"></div>
+    SYSTÈME ACTIF
+  </div>
+</header>
+
+<main>
+  <div class="badge">🇧🇯 Recherche UCAO · Bénin 2026</div>
+  <h1>Détectez une <em>arnaque</em><br>avant qu'il soit trop tard</h1>
+  <p class="sous-titre">
+    Copiez le message ou l'appel suspect reçu.<br>
+    Notre système l'analyse en quelques secondes.
+  </p>
+
+  <div class="carte">
+    <div class="label">📨 Message ou situation suspecte</div>
+    <textarea
+      id="msg"
+      placeholder="Ex: Félicitations ! Vous avez gagné 200 000 FCFA dans le tirage MTN. Envoyez votre code PIN au 97XXXXXX...">
+    </textarea>
+
+    <div class="exemples">
+      <button class="ex-btn" onclick="exemple(0)">⚡ Faux tirage</button>
+      <button class="ex-btn" onclick="exemple(1)">⚡ Faux agent</button>
+      <button class="ex-btn" onclick="exemple(2)">⚡ Urgence famille</button>
+      <button class="ex-btn" onclick="exemple(3)">⚡ Faux remboursement</button>
+    </div>
+
+    <button class="btn-analyser" id="btn" onclick="analyser()">
+      <span id="btn-texte">🔍 Analyser maintenant</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <div id="resultat"></div>
+
+  <div class="carte" style="margin-top:8px">
+    <div class="label">🚨 Numéros d'urgence</div>
+    <div class="contacts">
+      <div class="contact">
+        <div class="contact-num">100</div>
+        <div class="contact-nom">MTN MoMo</div>
+      </div>
+      <div class="contact">
+        <div class="contact-num">144</div>
+        <div class="contact-nom">Moov Money</div>
+      </div>
+      <div class="contact">
+        <div class="contact-num">166</div>
+        <div class="contact-nom">Police</div>
+      </div>
+      <div class="contact">
+        <div class="contact-num">117</div>
+        <div class="contact-nom">Gendarmerie</div>
+      </div>
+      <div class="contact">
+        <div class="contact-num">1010</div>
+        <div class="contact-nom">Celtiis</div>
+      </div>
+      <div class="contact">
+        <div class="contact-num">166</div>
+        <div class="contact-nom">CRIET</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    MoMo GaïGuard · Recherche académique · UCAO Bénin 2026<br>
+    Ne partagez jamais votre code PIN ou OTP avec qui que ce soit.
+  </footer>
+</main>
+
+<script>
+const exemples = [
+  "Félicitations ! Vous avez gagné 200 000 FCFA dans le tirage MTN de novembre. Envoyez votre code PIN au 97441234 pour recevoir votre gain dans 2 heures.",
+  "Bonjour je suis l'agent Koffi de MTN. Nous avons détecté une activité suspecte sur votre compte. Donnez-moi le code OTP que vous venez de recevoir.",
+  "Papa c'est moi Kossi. Je suis à l'hôpital suite à un accident. J'ai besoin de 75 000 FCFA urgent. Envoie vite sur ce numéro 96XXXXXX.",
+  "Bonsoir, j'ai envoyé par erreur 50 000 FCFA sur votre numéro. C'est pour un enterrement urgent. Pouvez-vous me renvoyer 45 000 FCFA ?"
+];
+
+function exemple(i) {
+  document.getElementById('msg').value = exemples[i];
+}
+
+async function analyser() {
+  const message = document.getElementById('msg').value.trim();
+  if (!message) {
+    alert('Veuillez saisir un message à analyser.');
+    return;
+  }
+
+  // Afficher le chargement
+  const btn       = document.getElementById('btn');
+  const btnTexte  = document.getElementById('btn-texte');
+  const spinner   = document.getElementById('spinner');
+  btn.disabled    = true;
+  btnTexte.style.display = 'none';
+  spinner.style.display  = 'block';
+
+  try {
+    const reponse = await fetch('/analyser', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ message })
+    });
+
+    const data = await reponse.json();
+    afficherResultat(data);
+
+  } catch (erreur) {
+    alert('Erreur de connexion. Vérifiez que le serveur tourne.');
+  } finally {
+    btn.disabled           = false;
+    btnTexte.style.display = 'inline';
+    spinner.style.display  = 'none';
+  }
+}
+
+function afficherResultat(data) {
+  const div = document.getElementById('resultat');
+
+  const configs = {
+    DANGER:  { cls: 'danger',  emoji: '🚨', label: 'ARNAQUE PROBABLE' },
+    SUSPECT: { cls: 'suspect', emoji: '⚠️', label: 'MESSAGE SUSPECT'  },
+    SUR:     { cls: 'sur',     emoji: '✅', label: 'MESSAGE NORMAL'   }
+  };
+  const couleurs = {
+    DANGER: '#ff3d5a', SUSPECT: '#ff9f1c', SUR: '#06d6a0'
+  };
+
+  const cfg    = configs[data.risque] || configs['SUSPECT'];
+  const couleur = couleurs[data.risque] || couleurs['SUSPECT'];
+
+  const signauxHTML = (data.alertes || []).map(a =>
+    `<span class="signal-tag">${a}</span>`
+  ).join('');
+
+  div.innerHTML = `
+    <div class="result-box ${cfg.cls}">
+      <div class="result-top">
+        <div class="result-emoji">${cfg.emoji}</div>
+        <div>
+          <div class="result-verdict">${cfg.label}</div>
+          <div class="result-sub">${data.verdict || ''}</div>
+        </div>
+      </div>
+
+      <div class="barre-label">Score de risque : ${data.score}/100</div>
+      <div class="barre-bg">
+        <div class="barre-fill" id="barre"
+             style="background:${couleur}"></div>
+      </div>
+
+      ${signauxHTML ? `
+        <div class="signaux-titre">Signaux détectés</div>
+        <div class="signaux-liste">${signauxHTML}</div>
+      ` : ''}
+
+      <div class="conseil-box">
+        💡 <strong>À faire maintenant :</strong><br>
+        ${data.conseil || 'En cas de doute, appelez le 100 (MTN) ou 144 (Moov).'}
+      </div>
+    </div>
+  `;
+
+  div.style.display = 'block';
+
+  // Animation barre
+  setTimeout(() => {
+    const barre = document.getElementById('barre');
+    if (barre) barre.style.width = data.score + '%';
+  }, 100);
+
+  // Scroll vers résultat
+  div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>

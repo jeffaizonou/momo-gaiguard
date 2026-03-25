@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Bibliothèques (se réinstallent avec la commande : npm install)
+node_modules/
+
+# Données de recherche (Régistre Analyse et Résultats des messages utilisateurs) 
+logs.cvs
+*.db
+
+# Ngrok (Passerelle temporaire)
+ngrok.exe
+
+# Fichiers système Windows
+Thumbs.db
+desktop.ini
+
+# Paramètres éditeur
+.vscode/
